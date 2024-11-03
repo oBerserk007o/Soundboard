@@ -1,14 +1,20 @@
 import asyncio
+import threading
 from sound import Sound
 from window import Window
 
-async def main():
-    loop = asyncio.get_event_loop()
-    window = Window(loop)
-    await window.add_button("Unga bunga", Sound("FS.mp3"))
+async def run_asyncio(window):
+    while window.running:
+        window.root.update()
+        await asyncio.sleep(0.01)
+
+def main():
+    window = Window()
+    window.add_button("Unga bunga", Sound("RAWR.mp3"))
     window.update_buttons()
-    # loop.run_forever()
-    # loop.close()
+
+    asyncio.run(run_asyncio(window))
 
 
-asyncio.run(main())
+if __name__ == "__main__":
+    threading.Thread(target=main).start()
