@@ -1,6 +1,7 @@
 from pygame import mixer
 from sound import Sound
 import asyncio
+import logging
 
 cable = "CABLE Input (VB-Audio Virtual Cable)"
 headphones = "Headphones (Realtek(R) Audio)"
@@ -14,26 +15,22 @@ async def play_sound_through_device(sound: Sound, device: str):
 
 
 class Player:
-    def __init__(self):
+    def __init__(self, logger: logging):
+        self.logger = logger
         self.is_playing = False
+        logger.debug("New player created")
 
     async def play_sound(self, sound: Sound):
+        self.logger.debug(f"Playing {sound.name}")
         self.is_playing = True
-        print(f"Playing {sound.name}")
         async with asyncio.TaskGroup() as tg:
             tg.create_task(play_sound_through_device(sound, cable))
             tg.create_task(play_sound_through_device(sound, headphones))
             await asyncio.sleep(sound.length)
         self.is_playing = False
         mixer.quit()
+        self.logger.debug(f"Sound {sound.name} stopped")
 
     def close(self):
+        self.logger.debug("Closing player")
         del self
-
-
-if __name__ == "__main__":
-    async def main():
-        player = Player()
-        await player.play_sound(Sound("SG.mp3"))
-
-    asyncio.run(main())
