@@ -7,6 +7,11 @@ async def run_asyncio(window):
     while window.running:
         window.root.update()
         await asyncio.sleep(0.01)
+    for button in window.buttons:
+        print("a" if button.player else "b")
+        if button.player:
+            button.stop_sound()
+            print(button.player)
 
 def main():
     window = Window()

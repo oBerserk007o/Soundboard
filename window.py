@@ -1,7 +1,7 @@
 import asyncio
 import tkinter as tk
 from tkinter import font as tkFont, messagebox
-from button import Button
+from sound_button import SoundButton
 from sound import Sound
 
 
@@ -18,7 +18,7 @@ class Window:
         self.small_fonts = tkFont.Font(family="Small Fonts", size=18, weight="bold")
 
     def add_button(self, text: str, sound: Sound):
-        button = Button(text, sound)
+        button = SoundButton(text, sound)
         tk_button = tk.Button(text=text, background="#141f52", activebackground="#0f163b",
                               activeforeground="white", fg="white", width=10, height=2,
                               borderwidth=0, border=0, font=self.small_fonts,

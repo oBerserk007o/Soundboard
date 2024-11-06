@@ -1,3 +1,4 @@
+import pathlib
 from pygame import mixer
 from sound import Sound
 import asyncio
@@ -8,7 +9,7 @@ headphones = "Headphones (Realtek(R) Audio)"
 
 async def play_sound_through_device(sound: Sound, device: str):
     mixer.init(devicename=device)
-    mixer.music.load(fr"C:\Users\Dorno\Desktop\Coding projects\Python\Soundboard\sounds\{sound.name}")
+    mixer.music.load(fr"{pathlib.Path().resolve()}\Sounds\{sound.name}")
     mixer.music.play()
     mixer.music.set_volume(0.15)
 
@@ -29,11 +30,3 @@ class Player:
 
     def close(self):
         del self
-
-
-if __name__ == "__main__":
-    async def main():
-        player = Player()
-        await player.play_sound(Sound("SG.mp3"))
-
-    asyncio.run(main())
