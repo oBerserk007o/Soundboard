@@ -1,7 +1,7 @@
 import asyncio
 import tkinter as tk
 from tkinter import font as tkFont, messagebox
-from button import Button
+from buttons import SoundButton
 from sound import Sound
 import logging
 
@@ -21,7 +21,7 @@ class Window:
         logger.info("Window created")
 
     def add_button(self, text: str, sound: Sound):
-        button = Button(text, sound, self.logger)
+        button = SoundButton(text, sound, self.logger)
         tk_button = tk.Button(text=text, background="#141f52", activebackground="#0f163b",
                               activeforeground="white", fg="white", width=10, height=2,
                               borderwidth=0, border=0, font=self.small_fonts,

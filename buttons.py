@@ -4,7 +4,7 @@ from player import Player
 import logging
 
 
-class Button:
+class SoundButton:
     def __init__(self, text: str, sound: Sound, logger: logging, tk_button: tkinter.Button=None):
         self.text = text
         self.sound = sound
