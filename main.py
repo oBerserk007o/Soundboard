@@ -6,6 +6,15 @@ import logging
 import time
 import sounddevice as sd
 
+
+queried_devices = sd.query_devices()
+devices = {"cable": "CABLE Input (VB-Audio Virtual Cable)", "headphones": "Headphones (Realtek(R) Audio)"}
+for element in queried_devices:
+    if devices["headphones"] in element["name"]:
+        devices["headphones"] = element["index"]
+        break
+
+
 logging.basicConfig(
     filename=f"{time.strftime('%Y%m%d_%H%M%S')}.log",
     encoding="utf-8",
@@ -25,9 +34,10 @@ async def run_asyncio(window):
     logging.info("Application shutdown from main")
 
 def main():
-    print(sd.query_devices())
-    window = Window(logging)
-    window.add_button("Unga bunga", Sound("RAWR.mp3"))
+    window = Window(devices, logging)
+    window.add_button("Unga bunga", Sound("RAWR.mp3"), (0, 0))
+    window.add_button("skibidibopmdada", Sound("skibidibopmdada.mp3"), (1, 0))
+    window.add_button("skibidibopmdada edge", Sound("skibidibopmdadaedge.mp3"), (2, 0))
     window.update_buttons()
 
     asyncio.run(run_asyncio(window))

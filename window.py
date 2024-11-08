@@ -7,7 +7,7 @@ import logging
 
 
 class Window:
-    def __init__(self, logger: logging):
+    def __init__(self, devices: {}, logger: logging):
         self.buttons = []
         self.logger = logger
         self.running = True
@@ -18,17 +18,21 @@ class Window:
         self.root.protocol("WM_DELETE_WINDOW", self.close)
         self.root.configure(background="#060812")
         self.small_fonts = tkFont.Font(family="Small Fonts", size=18, weight="bold")
+        self.devices = devices
         logger.info("Window created")
 
-    def add_button(self, text: str, sound: Sound):
-        button = SoundButton(text, sound, self.logger)
+    def add_button(self, text: str, sound: Sound, pos: ()):
+        button = SoundButton(text, sound, self.devices, self.logger)
         tk_button = tk.Button(text=text, background="#141f52", activebackground="#0f163b",
-                              activeforeground="white", fg="white", width=10, height=2,
+                              activeforeground="white", fg="white", width=int(len(text) * 0.8) + 2, height=2,
                               borderwidth=0, border=0, font=self.small_fonts,
                               command=lambda: asyncio.run_coroutine_threadsafe(button.play_sound(),
                                                                                asyncio.get_running_loop()))
         button.associate_tk_button(tk_button)
         self.buttons.append(button)
+
+        button.tk_button.grid(column=pos[0], row=pos[1])
+        button.is_rendered = True
         self.logger.debug(f"New button added with text '{button.text}' and sound '{button.sound.name}'")
 
     def update_buttons(self):
@@ -39,6 +43,11 @@ class Window:
 
     def close(self):
         if messagebox.askyesno("Quit", "Do you want to quit?"):
+            for button in self.buttons:
+                print(button.players)
+                if len(button.players) != 0:
+                    button.stop_sound()
+                print(button.players, " should be empty")
             self.root.destroy()
             self.running = False
-        self.logger.info("Window closed")
+            self.logger.info("Window closed")
