@@ -5,17 +5,17 @@ import logging
 
 
 class SoundButton:
-    def __init__(self, text: str, sound: Sound, devices: {}, logger: logging, tk_button: tkinter.Button=None):
+    def __init__(self, text: str, sound: Sound, devices: dict, logger: logging, tk: tkinter.Button=None):
         self.text = text
         self.sound = sound
-        self.tk_button = tk_button
+        self.tk = tk
         self.is_rendered = False
         self.logger = logger
         self.players = []
         self.devices = devices
 
-    def associate_tk_button(self, tk_button: tkinter.Button):
-        self.tk_button = tk_button
+    def associate_tk_button(self, tk: tkinter.Button):
+        self.tk = tk
 
     async def play_sound(self):
         player = Player(self.devices, self.logger)

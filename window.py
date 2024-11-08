@@ -31,7 +31,7 @@ class Window:
         button.associate_tk_button(tk_button)
         self.buttons.append(button)
 
-        button.tk_button.grid(column=pos[0], row=pos[1])
+        button.tk.grid(column=pos[0], row=pos[1])
         button.is_rendered = True
         self.logger.debug(f"New button added with text '{button.text}' and sound '{button.sound.name}'")
 
@@ -40,6 +40,18 @@ class Window:
             if not button.is_rendered:
                 button.tk_button.grid(column=0, row=0)
                 button.is_rendered = True
+
+    def load_configuration(self, configuration: dict):
+        try:
+            for i in range(len(configuration)):
+                match configuration["elements"][i]["type"]:
+                    case "sound_button":
+                        self.add_button(configuration["elements"][i]["name"], configuration["elements"][i]["sound"],
+                                        configuration["elements"][i]["pos"])
+            self.update_buttons()
+            self.logger.debug(f"Loaded configuration {configuration["name"]}")
+        except:
+            self.logger.exception("Invalid configuration file")
 
     def close(self):
         if messagebox.askyesno("Quit", "Do you want to quit?"):
