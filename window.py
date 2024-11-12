@@ -71,24 +71,28 @@ class Window:
     def load_menu_bar(self, menu_bar: dict):
         menu_bar_tk = Menu()
         self.root.config(menu=menu_bar_tk)
+        print(menu_bar["elements"])
 
         for i in range(len(menu_bar["elements"])):
             i = str(i)
             element = menu_bar["elements"][i]
             match element["type"]:
                 case "command":
-                    print(element)
-                    print(element["type"])
-                    print(element["command"])
-                    print(self.commands[element["command"]])
                     menu_bar_tk.add_command(label=element["title"], command=self.commands[element["command"]])
                 case "cascade":
-                    pass
+                    new_menu = Menu(menu_bar_tk)
+                    menu_bar_tk.add_cascade(menu=new_menu, label=element["title"])
+                    for j in range(len(element["elements"])):
+                        j = str(j)
+                        nested_element = element["elements"][j]
+                        match nested_element["type"]:
+                            case "command":
+                                new_menu.add_command(label=nested_element["title"],
+                                                     command=self.commands[nested_element["command"]])
+                            case "separator":
+                                new_menu.add_separator()
 
-        soundboard_menu = Menu(menu_bar_tk, tearoff=0)
-        menu_bar_tk.add_command(label="Soundboard", command=lambda: print("Wow!"))
-        soundboard_menu.add_command(label="Wow", command=lambda: print("Wow!"))
-        self.logger.info(f"Loaded menu bar {soundboard_menu}, {menu_bar_tk}")
+        self.logger.info(f"Loaded menu bar")
 
     def close(self):
         if messagebox.askyesno("Quit", "Do you want to quit?"):
