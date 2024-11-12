@@ -1,36 +1,22 @@
 {
-  "soundboard": {
-    "name": "soundboard",
-    "elements": {
+  "elements": {
       "0": {
         "type": "sound_button",
         "name": "Unga Bunga",
         "sound": "RAWR.mp3",
-        "pos": "0, 0"
+        "pos": "0,0"
       },
       "1": {
         "type": "sound_button",
         "name": "skibidibopmdada",
         "sound": "skibidibopmdada.mp3",
-        "pos": "1, 0"
+        "pos": "1,0"
       },
       "2": {
         "type": "sound_button",
         "name": "skibidibopmdada edge",
         "sound": "skibidibopmdadaedge.mp3",
-        "pos": "2, 0"
+        "pos": "2,0"
       }
     }
-  },
-  "settings": {
-    "name": "settings",
-    "elements": {
-      "0": {
-        "type": "sound_button",
-        "name": "Unga Shlunga",
-        "sound": "RAWR.mp3",
-        "pos": "0, 0"
-      }
-    }
-  }
 }

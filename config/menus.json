@@ -1,0 +1,24 @@
+{
+  "soundboard": {
+    "name": "soundboard",
+    "sounds": "sounds.json",
+    "elements": {
+      "0": {
+        "type": "title",
+        "name": "Unga Bunga",
+        "pos": "0,0"
+      }
+    }
+  },
+  "settings": {
+    "name": "settings",
+    "elements": {
+      "0": {
+        "type": "title",
+        "name": "Unga Shlunga",
+        "sound": "RAWR.mp3",
+        "pos": "0,0"
+      }
+    }
+  }
+}

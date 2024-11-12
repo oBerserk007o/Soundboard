@@ -1,18 +1,26 @@
 import asyncio
 import json
 import threading
-from sound import Sound
 from window import Window
 import logging
 import time
 import sounddevice as sd
 
-configurations = {}
+menus = {}
+menu_bar = {}
+
 try:
-    with open("configurations.json", "r") as f:
-        configurations = json.load(f)
+    with open("config/menus.json", "r") as f:
+        menus = json.load(f)
 except:
-    logging.exception("Configuration file not found (make sure it's named correctly as 'configurations.json')")
+    logging.exception("menus.json file not found (make sure it's named correctly as 'menus.json' and in the config directory)")
+
+try:
+    with open("config/menu_bar.json", "r") as f:
+        menu_bar = json.load(f)
+except:
+    logging.exception("menu_bar.json file not found (make sure it's named correctly as 'menu_bar.json' and in the config directory)")
+
 
 queried_devices = sd.query_devices()
 devices = {"cable": "CABLE Input (VB-Audio Virtual Cable)", "headphones": "Headphones (Realtek(R) Audio)"}
@@ -42,12 +50,9 @@ async def run_asyncio(window):
 
 
 def main():
-    window = Window(devices, logging)
-    window.load_configuration(configurations["soundboard"])
-    # window.add_button("Unga bunga", Sound("RAWR.mp3"), (2, 0))
-    # window.add_button("skibidibopmdada", Sound("skibidibopmdada.mp3"), (3, 0))
-    # window.add_button("skibidibopmdada edge", Sound("skibidibopmdadaedge.mp3"), (0, 0))
-    # window.update_buttons()
+    window = Window(devices, menus, logging)
+    window.load_menu("soundboard")
+    window.load_menu_bar(menu_bar)
 
     asyncio.run(run_asyncio(window))
 

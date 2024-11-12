@@ -1,0 +1,30 @@
+{
+  "elements": {
+    "0": {
+      "title": "Soundboard",
+      "type": "command",
+      "command": "navigate:soundboard"
+    },
+    "1": {
+      "title": "Settings",
+      "type": "command",
+      "command": "navigate:settings"
+    },
+    "2": {
+      "title": "File",
+      "type": "cascade",
+      "elements": {
+        "0": {
+          "title": "Save sounds",
+          "type": "command",
+          "command": "save_sounds"
+        },
+        "1": {
+          "title": "Load sounds",
+          "type": "command",
+          "command": "load_sounds"
+        }
+      }
+    }
+  }
+}

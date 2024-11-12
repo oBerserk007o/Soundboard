@@ -1,16 +1,19 @@
 import asyncio
+import json
 import tkinter as tk
-from tkinter import font as tkFont, messagebox
+from tkinter import font as tkFont, messagebox, Menu
 from buttons import SoundButton
 from sound import Sound
 import logging
 
 
 class Window:
-    def __init__(self, devices: {}, logger: logging):
+    def __init__(self, devices: dict, menus: dict, logger: logging):
         self.buttons = []
         self.logger = logger
         self.running = True
+        self.devices = devices
+
         self.root = tk.Tk()
         self.root.geometry("640x360+320+180")
         self.root.title("Soundboard")
@@ -18,7 +21,16 @@ class Window:
         self.root.protocol("WM_DELETE_WINDOW", self.close)
         self.root.configure(background="#060812")
         self.small_fonts = tkFont.Font(family="Small Fonts", size=18, weight="bold")
-        self.devices = devices
+
+        self.menus = menus
+
+        self.commands = {
+            "navigate:soundboard": lambda: self.load_menu(menus["soundboard"]),
+            "navigate:settings": lambda: self.load_menu(menus["settings"]),
+            "save_sounds": None,
+            "load_sounds": None
+        }
+
         logger.info("Window created")
 
     def add_button(self, text: str, sound: Sound, pos: ()):
@@ -41,17 +53,42 @@ class Window:
                 button.tk_button.grid(column=0, row=0)
                 button.is_rendered = True
 
-    def load_configuration(self, configuration: dict):
+    def load_menu(self, selected_menu: str):
+        menu = self.menus["soundboard"]
+
         try:
-            for i in range(len(configuration)):
-                match configuration["elements"][i]["type"]:
-                    case "sound_button":
-                        self.add_button(configuration["elements"][i]["name"], configuration["elements"][i]["sound"],
-                                        configuration["elements"][i]["pos"])
+            with open(menu["sounds"]) as f:
+                sounds = json.load(f)
+            for i in range(len(sounds["elements"])):
+                i = str(i)
+                self.add_button(sounds["elements"][i]["name"], Sound(sounds["elements"][i]["sound"]),
+                                tuple(sounds["elements"][i]["pos"].split(",")))
             self.update_buttons()
-            self.logger.debug(f"Loaded configuration {configuration["name"]}")
+            self.logger.info(f"Loaded menu {menu["name"]}")
         except:
-            self.logger.exception("Invalid configuration file")
+            self.logger.exception("Invalid menu file")
+
+    def load_menu_bar(self, menu_bar: dict):
+        menu_bar_tk = Menu()
+        self.root.config(menu=menu_bar_tk)
+
+        for i in range(len(menu_bar["elements"])):
+            i = str(i)
+            element = menu_bar["elements"][i]
+            match element["type"]:
+                case "command":
+                    print(element)
+                    print(element["type"])
+                    print(element["command"])
+                    print(self.commands[element["command"]])
+                    menu_bar_tk.add_command(label=element["title"], command=self.commands[element["command"]])
+                case "cascade":
+                    pass
+
+        soundboard_menu = Menu(menu_bar_tk, tearoff=0)
+        menu_bar_tk.add_command(label="Soundboard", command=lambda: print("Wow!"))
+        soundboard_menu.add_command(label="Wow", command=lambda: print("Wow!"))
+        self.logger.info(f"Loaded menu bar {soundboard_menu}, {menu_bar_tk}")
 
     def close(self):
         if messagebox.askyesno("Quit", "Do you want to quit?"):
