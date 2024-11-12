@@ -4,9 +4,10 @@
     "sounds": "sounds.json",
     "elements": {
       "0": {
-        "type": "title",
-        "name": "Unga Bunga",
-        "pos": "0,0"
+        "type": "add_button",
+        "name": "+",
+        "command": "add_sound_button",
+        "pos": "0,1"
       }
     }
   },
@@ -14,9 +15,8 @@
     "name": "settings",
     "elements": {
       "0": {
-        "type": "title",
-        "name": "Unga Shlunga",
-        "sound": "RAWR.mp3",
+        "type": "label",
+        "name": "Herro, you orda settings? You fat fuck",
         "pos": "0,0"
       }
     }

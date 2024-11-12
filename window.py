@@ -9,7 +9,7 @@ import logging
 
 class Window:
     def __init__(self, devices: dict, menus: dict, logger: logging):
-        self.buttons = []
+        self.elements = []
         self.logger = logger
         self.running = True
         self.devices = devices
@@ -25,15 +25,22 @@ class Window:
         self.menus = menus
 
         self.commands = {
-            "navigate:soundboard": lambda: self.load_menu(menus["soundboard"]),
-            "navigate:settings": lambda: self.load_menu(menus["settings"]),
+            "navigate:soundboard": lambda: self.load_menu("soundboard"),
+            "navigate:settings": lambda: self.load_menu("settings"),
             "save_sounds": None,
             "load_sounds": None
         }
 
         logger.info("Window created")
 
-    def add_button(self, text: str, sound: Sound, pos: ()):
+    def add_label(self, text: str, pos: tuple):
+        label = (tk.Label(text=text, background="#141f52", activebackground="#0f163b",
+                              activeforeground="white", fg="white", width=int(len(text) * 0.8) + 2, height=2,
+                              borderwidth=0, border=0, font=self.small_fonts))
+        label.grid(column=pos[0], row=pos[1])
+        self.elements.append(label)
+
+    def add_button(self, text: str, sound: Sound, pos: tuple):
         button = SoundButton(text, sound, self.devices, self.logger)
         tk_button = tk.Button(text=text, background="#141f52", activebackground="#0f163b",
                               activeforeground="white", fg="white", width=int(len(text) * 0.8) + 2, height=2,
@@ -41,37 +48,39 @@ class Window:
                               command=lambda: asyncio.run_coroutine_threadsafe(button.play_sound(),
                                                                                asyncio.get_running_loop()))
         button.associate_tk_button(tk_button)
-        self.buttons.append(button)
+        self.elements.append(button)
 
         button.tk.grid(column=pos[0], row=pos[1])
         button.is_rendered = True
         self.logger.debug(f"New button added with text '{button.text}' and sound '{button.sound.name}'")
 
-    def update_buttons(self):
-        for button in self.buttons:
-            if not button.is_rendered:
-                button.tk_button.grid(column=0, row=0)
-                button.is_rendered = True
-
     def load_menu(self, selected_menu: str):
-        menu = self.menus["soundboard"]
+        menu = self.menus[selected_menu]
+        self.clear()
 
-        try:
-            with open(menu["sounds"]) as f:
-                sounds = json.load(f)
-            for i in range(len(sounds["elements"])):
-                i = str(i)
-                self.add_button(sounds["elements"][i]["name"], Sound(sounds["elements"][i]["sound"]),
-                                tuple(sounds["elements"][i]["pos"].split(",")))
-            self.update_buttons()
-            self.logger.info(f"Loaded menu {menu["name"]}")
-        except:
-            self.logger.exception("Invalid menu file")
+        for i in range(len(menu["elements"])):
+            i = str(i)
+            self.add_label(menu["elements"][i]["name"], tuple(menu["elements"][i]["pos"].split(",")))
+
+        if "sounds" in menu:
+            try:
+                with open(menu["sounds"]) as f:
+                    sounds = json.load(f)
+                for i in range(len(sounds["elements"])):
+                    i = str(i)
+                    self.add_button(sounds["elements"][i]["name"], Sound(sounds["elements"][i]["sound"]),
+                                    tuple(sounds["elements"][i]["pos"].split(",")))
+
+
+            except:
+                self.logger.exception("Invalid menu file")
+        else:
+            pass
+        self.logger.info(f"Loaded menu {menu['name']}")
 
     def load_menu_bar(self, menu_bar: dict):
         menu_bar_tk = Menu()
         self.root.config(menu=menu_bar_tk)
-        print(menu_bar["elements"])
 
         for i in range(len(menu_bar["elements"])):
             i = str(i)
@@ -94,13 +103,21 @@ class Window:
 
         self.logger.info(f"Loaded menu bar")
 
+    def clear(self):
+        for element in self.elements:
+            try:
+                element.tk.destroy()
+            except:
+                element.destroy()
+
     def close(self):
         if messagebox.askyesno("Quit", "Do you want to quit?"):
-            for button in self.buttons:
-                print(button.players)
-                if len(button.players) != 0:
-                    button.stop_sound()
-                print(button.players, " should be empty")
+            for element in self.elements:
+                if isinstance(element, SoundButton):
+                    print(element.players)
+                    if len(element.players) != 0:
+                        element.stop_sound()
+                    print(element.players, " should be empty")
             self.root.destroy()
             self.running = False
             self.logger.info("Window closed")
