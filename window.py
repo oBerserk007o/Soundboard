@@ -5,6 +5,7 @@ from tkinter import font as tkFont, messagebox, Menu
 from buttons import SoundButton
 from sound import Sound
 import logging
+from functools import partial
 
 
 class Window:
@@ -25,10 +26,10 @@ class Window:
         self.menus = menus
 
         self.commands = {
-            "navigate:soundboard": lambda: self.load_menu("soundboard"),
-            "navigate:settings": lambda: self.load_menu("settings"),
-            "save_sounds": None,
-            "load_sounds": None
+            "navigate": lambda to: self.load_menu(to[0]),
+            "add_sound_button": lambda settings: self.add_sound_button(settings[0], settings[1], settings[2]),
+            "save_sounds": lambda: self.save_sounds(),
+            "load_sounds": lambda: self.load_sounds()
         }
 
         logger.info("Window created")
@@ -40,7 +41,7 @@ class Window:
         label.grid(column=pos[0], row=pos[1])
         self.elements.append(label)
 
-    def add_button(self, text: str, sound: Sound, pos: tuple):
+    def add_sound_button(self, text: str, sound: Sound, pos: tuple):
         button = SoundButton(text, sound, self.devices, self.logger)
         tk_button = tk.Button(text=text, background="#141f52", activebackground="#0f163b",
                               activeforeground="white", fg="white", width=int(len(text) * 0.8) + 2, height=2,
@@ -52,7 +53,16 @@ class Window:
 
         button.tk.grid(column=pos[0], row=pos[1])
         button.is_rendered = True
-        self.logger.debug(f"New button added with text '{button.text}' and sound '{button.sound.name}'")
+        self.logger.debug(f"Sound button added with text '{button.text}' and sound '{button.sound.name}'")
+
+    def add_button(self, text: str, pos: tuple, command: str):
+        button = tk.Button(text=text, background="#141f52", activebackground="#0f163b",
+                              activeforeground="white", fg="white", width=int(len(text) * 0.8) + 2, height=2,
+                              borderwidth=0, border=0, font=self.small_fonts,
+                              command=self.commands[command])
+        self.elements.append(button)
+
+        button.grid(column=pos[0], row=pos[1])
 
     def load_menu(self, selected_menu: str):
         menu = self.menus[selected_menu]
@@ -68,7 +78,7 @@ class Window:
                     sounds = json.load(f)
                 for i in range(len(sounds["elements"])):
                     i = str(i)
-                    self.add_button(sounds["elements"][i]["name"], Sound(sounds["elements"][i]["sound"]),
+                    self.add_sound_button(sounds["elements"][i]["name"], Sound(sounds["elements"][i]["sound"]),
                                     tuple(sounds["elements"][i]["pos"].split(",")))
 
 
@@ -87,7 +97,11 @@ class Window:
             element = menu_bar["elements"][i]
             match element["type"]:
                 case "command":
-                    menu_bar_tk.add_command(label=element["title"], command=self.commands[element["command"]])
+                    if ":" in element["command"]:
+                        command = element["command"].split(":")[0]
+                        settings = element["command"].split(":")[1:]
+                        func = partial(self.commands[command], settings)
+                        menu_bar_tk.add_command(label=element["title"], command=func)
                 case "cascade":
                     new_menu = Menu(menu_bar_tk)
                     menu_bar_tk.add_cascade(menu=new_menu, label=element["title"])
@@ -96,12 +110,21 @@ class Window:
                         nested_element = element["elements"][j]
                         match nested_element["type"]:
                             case "command":
+                                command = nested_element["command"].split(":")[0]
+                                settings = nested_element["command"].split(":")[1:]
+                                func = partial(print, settings)
                                 new_menu.add_command(label=nested_element["title"],
-                                                     command=self.commands[nested_element["command"]])
+                                                     command=func)
                             case "separator":
                                 new_menu.add_separator()
 
-        self.logger.info(f"Loaded menu bar")
+        self.logger.info("Loaded menu bar")
+
+    def save_sounds(self):
+        pass
+
+    def load_sounds(self):
+        pass
 
     def clear(self):
         for element in self.elements:
@@ -109,6 +132,7 @@ class Window:
                 element.tk.destroy()
             except:
                 element.destroy()
+        self.elements.clear()
 
     def close(self):
         if messagebox.askyesno("Quit", "Do you want to quit?"):
