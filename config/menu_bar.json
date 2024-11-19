@@ -1,16 +1,6 @@
 {
   "elements": {
     "0": {
-      "title": "Soundboard",
-      "type": "command",
-      "command": "navigate:soundboard"
-    },
-    "1": {
-      "title": "Settings",
-      "type": "command",
-      "command": "navigate:settings"
-    },
-    "2": {
       "title": "File",
       "type": "cascade",
       "elements": {
@@ -25,6 +15,16 @@
           "command": "load_sounds"
         }
       }
+    },
+    "1": {
+      "title": "Soundboard",
+      "type": "command",
+      "command": "navigate:soundboard"
+    },
+    "2": {
+      "title": "Settings",
+      "type": "command",
+      "command": "navigate:settings"
     }
   }
 }

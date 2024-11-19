@@ -19,7 +19,7 @@ for element in devices:
 
 
 async def play_sound_sd(device):
-    data, fs = sf.read("sounds/RAWR.mp3")
+    data, fs = sf.read("../sounds/RAWR.mp3")
     sd.play(data * 0.1, fs, device=device)
     print(f"playing through {device}")
 

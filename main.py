@@ -58,4 +58,6 @@ def main():
 
 
 if __name__ == "__main__":
-    threading.Thread(target=main).start()
+    main_thread = threading.Thread(target=main)
+    main_thread.start()
+    main_thread.join()

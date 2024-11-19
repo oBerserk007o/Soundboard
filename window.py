@@ -1,11 +1,20 @@
 import asyncio
 import json
 import tkinter as tk
-from tkinter import font as tkFont, messagebox, Menu
+from tkinter import font as tkFont, messagebox, Menu, simpledialog
+from tkinter.filedialog import askopenfilename
 from buttons import SoundButton
 from sound import Sound
 import logging
 from functools import partial
+
+
+def choose_settings_for_button():
+    name = simpledialog.askstring(title="Name", prompt="What do want to name it? : ")
+    file = askopenfilename().split("/")[-1]
+    print(file)
+
+    return [name, file]
 
 
 class Window:
@@ -27,7 +36,7 @@ class Window:
 
         self.commands = {
             "navigate": lambda to: self.load_menu(to[0]),
-            "add_sound_button": lambda settings: self.add_sound_button(settings[0], settings[1], settings[2]),
+            "add_sound_button": lambda settings: self.add_sound_button_from_button(),
             "save_sounds": lambda: self.save_sounds(),
             "load_sounds": lambda: self.load_sounds()
         }
@@ -40,6 +49,16 @@ class Window:
                               borderwidth=0, border=0, font=self.small_fonts))
         label.grid(column=pos[0], row=pos[1])
         self.elements.append(label)
+
+    def add_sound_button_from_button(self):
+        settings = choose_settings_for_button()
+        try:
+            sound = Sound(settings[1])
+            pos = (0, 0)
+            self.add_sound_button(settings[0], sound, (pos[0], pos[1] + 1))
+        except:
+            self.logger.exception("")
+            self.logger.error("Please choose a sound file within the 'sounds' directory")
 
     def add_sound_button(self, text: str, sound: Sound, pos: tuple):
         button = SoundButton(text, sound, self.devices, self.logger)
@@ -56,10 +75,13 @@ class Window:
         self.logger.debug(f"Sound button added with text '{button.text}' and sound '{button.sound.name}'")
 
     def add_button(self, text: str, pos: tuple, command: str):
+        command = command.split(":")[0]
+        settings = command.split(":")[:1]
+        func = partial(self.commands[command], settings)
         button = tk.Button(text=text, background="#141f52", activebackground="#0f163b",
                               activeforeground="white", fg="white", width=int(len(text) * 0.8) + 2, height=2,
                               borderwidth=0, border=0, font=self.small_fonts,
-                              command=self.commands[command])
+                              command=func)
         self.elements.append(button)
 
         button.grid(column=pos[0], row=pos[1])
@@ -70,7 +92,12 @@ class Window:
 
         for i in range(len(menu["elements"])):
             i = str(i)
-            self.add_label(menu["elements"][i]["name"], tuple(menu["elements"][i]["pos"].split(",")))
+            element = menu["elements"][i]
+            match element["type"]:
+                case "label":
+                    self.add_label(element["name"], tuple(element["pos"].split(",")))
+                case "add_button":
+                    self.add_button(element["name"], tuple(element["pos"].split(",")), element["command"])
 
         if "sounds" in menu:
             try:
@@ -80,8 +107,6 @@ class Window:
                     i = str(i)
                     self.add_sound_button(sounds["elements"][i]["name"], Sound(sounds["elements"][i]["sound"]),
                                     tuple(sounds["elements"][i]["pos"].split(",")))
-
-
             except:
                 self.logger.exception("Invalid menu file")
         else:
@@ -112,7 +137,7 @@ class Window:
                             case "command":
                                 command = nested_element["command"].split(":")[0]
                                 settings = nested_element["command"].split(":")[1:]
-                                func = partial(print, settings)
+                                func = partial(self.commands[command], settings)
                                 new_menu.add_command(label=nested_element["title"],
                                                      command=func)
                             case "separator":
@@ -138,10 +163,8 @@ class Window:
         if messagebox.askyesno("Quit", "Do you want to quit?"):
             for element in self.elements:
                 if isinstance(element, SoundButton):
-                    print(element.players)
                     if len(element.players) != 0:
                         element.stop_sound()
-                    print(element.players, " should be empty")
             self.root.destroy()
             self.running = False
             self.logger.info("Window closed")
