@@ -9,7 +9,6 @@ class SoundButton:
         self.text = text
         self.sound = sound
         self.tk = tk
-        self.is_rendered = False
         self.logger = logger
         self.players = []
         self.devices = devices

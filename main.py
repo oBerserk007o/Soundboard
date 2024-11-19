@@ -14,12 +14,14 @@ try:
         menus = json.load(f)
 except:
     logging.exception("menus.json file not found (make sure it's named correctly as 'menus.json' and in the config directory)")
+    exit(0)
 
 try:
     with open("config/menu_bar.json", "r") as f:
         menu_bar = json.load(f)
 except:
     logging.exception("menu_bar.json file not found (make sure it's named correctly as 'menu_bar.json' and in the config directory)")
+    exit(0)
 
 
 queried_devices = sd.query_devices()
