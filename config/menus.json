@@ -13,6 +13,7 @@
   },
   "settings": {
     "name": "settings",
+    "file": "/config/settings.json",
     "elements": {
       "0": {
         "type": "label",

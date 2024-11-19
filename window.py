@@ -19,7 +19,7 @@ def choose_settings_for_button():
 
 
 class Window:
-    def __init__(self, devices: dict, menus: dict, logger: logging):
+    def __init__(self, devices: dict, menus: dict, settings: dict, logger: logging):
         self.sounds = {}
         self.elements = []
         self.logger = logger
@@ -43,6 +43,8 @@ class Window:
             "load_sounds": lambda: self.load_sounds()
         }
 
+        self.settings = settings
+
         logger.info("Window created")
 
     def add_label(self, text: str, pos: tuple):
@@ -65,7 +67,7 @@ class Window:
             self.logger.error("Please choose a sound file within the 'sounds' directory")
 
     def add_sound_button(self, text: str, sound: Sound, pos: tuple):
-        button = SoundButton(text, sound, self.devices, self.logger)
+        button = SoundButton(text, sound, self.devices, self.logger, self.settings["in_volume"], self.settings["out_volume"])
         tk_button = tk.Button(text=text, background="#141f52", activebackground="#0f163b",
                               activeforeground="white", fg="white", width=int(len(text) * 0.8) + 2, height=2,
                               borderwidth=0, border=0, font=self.small_fonts,
@@ -75,7 +77,6 @@ class Window:
         self.elements.append(button)
 
         button.tk.grid(column=pos[0], row=pos[1])
-        self.logger.debug(f"Sound button added with text '{button.text}' and sound '{button.sound.name}'")
 
     def add_button(self, text: str, pos: tuple, command: str):
         command = command.split(":")[0]
@@ -169,6 +170,10 @@ class Window:
 
     def load_sounds(self):
         pass
+
+    def reload_settings(self):
+        with open(self.menus["settings"]["file"]) as settings_file:
+            self.settings = json.load(settings_file)
 
     def clear(self):
         for element in self.elements:
