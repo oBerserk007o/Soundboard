@@ -1,6 +1,5 @@
 import tkinter
-from sound import Sound
-from player import Player
+from player import Sound, Player
 import logging
 
 

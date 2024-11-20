@@ -1,6 +1,6 @@
+from mutagen.mp3 import MP3
 import pathlib
 from pygame import mixer
-from sound import Sound
 import asyncio
 import logging
 import sounddevice as sd
@@ -17,6 +17,13 @@ async def play_sound_mixer(sound, device, volume):
     mixer.music.load(fr"{pathlib.Path().resolve()}\sounds\{sound.name}")
     mixer.music.play()
     mixer.music.set_volume(volume * 0.3)
+
+
+class Sound:
+    def __init__(self, filename: str):
+        self.name = filename
+        self.length = MP3(fr"{pathlib.Path().resolve()}\Sounds\{self.name}").info.length
+        print(self.length, self.name)
 
 
 class Player:

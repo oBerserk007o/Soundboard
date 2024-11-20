@@ -1,6 +1,6 @@
 {
-  "warn_before_close": true,
-  "out_volume": "0.5",
-  "in_volume": "0.5",
+  "warn_before_close": false,
+  "out_volume": 0.5,
+  "in_volume": 0.5,
   "tps": 100
 }

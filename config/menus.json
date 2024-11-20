@@ -13,11 +13,21 @@
   },
   "settings": {
     "name": "settings",
-    "file": "/config/settings.json",
+    "file": "config/settings.json",
     "elements": {
       "0": {
         "type": "label",
-        "name": "Herro, you orda settings? You fat fuck",
+        "name": "[insert settings here]",
+        "pos": "0,0"
+      }
+    }
+  },
+  "config": {
+    "name": "config",
+    "elements": {
+      "0": {
+        "type": "label",
+        "name": "[insert config here]",
         "pos": "0,0"
       }
     }

@@ -6,15 +6,17 @@ import tkinter as tk
 from tkinter import font as tk_font, messagebox, Menu, simpledialog
 from tkinter.filedialog import askopenfilename
 from buttons import SoundButton
-from sound import Sound
+from player import Sound
 import logging
 from functools import partial
 
 
 def choose_settings_for_button():
     name = simpledialog.askstring(title="Name", prompt="What do want to name it? : ")
-    file = askopenfilename().split("/")[-1]
-    print(file)
+    if name != None:
+        file = askopenfilename().split("/")[-1]
+    else:
+        return
     return [name, file]
 
 
@@ -29,7 +31,7 @@ class Window:
         self.root = tk.Tk()
         self.root.geometry("640x360+320+180")
         self.root.title("Soundboard")
-        self.root.bind("<Escape>", lambda e: self.close())
+        # self.root.bind("<Escape>", lambda e: self.close())
         self.root.protocol("WM_DELETE_WINDOW", self.close)
         self.root.configure(background="#060812")
         self.small_fonts = tk_font.Font(family="Small Fonts", size=18, weight="bold")
@@ -38,7 +40,7 @@ class Window:
 
         self.commands = {
             "navigate": lambda to: self.load_menu(to[0]),
-            "add_sound_button": lambda settings: self.add_sound_button_from_button(),
+            "add_sound_button": lambda: self.add_sound_button_from_button(),
             "save_sounds": lambda: self.save_sounds(),
             "load_sounds": lambda: self.load_sounds()
         }
@@ -56,15 +58,16 @@ class Window:
 
     def add_sound_button_from_button(self):
         settings = choose_settings_for_button()
-        try:
-            name = settings[0]
-            sound = Sound(settings[1])
-            pos = (0, 0)
-            self.add_sound_button(settings[0], sound, (pos[0], pos[1] + 1))
-            self.sounds["elements"][str(int(max(self.sounds["elements"].keys())) + 1)] = {"name": name, "sound": sound.name, "pos": f"{pos[0]},{pos[1]}"}
-        except:
-            self.logger.exception("")
-            self.logger.error("Please choose a sound file within the 'sounds' directory")
+        if settings is not None:
+            try:
+                name = settings[0]
+                sound = Sound(settings[1])
+                pos = (0, 0)
+                self.add_sound_button(settings[0], sound, (pos[0], pos[1] + 1))
+                self.sounds["elements"][str(int(max(self.sounds["elements"].keys())) + 1)] = {"name": name, "sound": sound.name, "pos": f"{pos[0]},{pos[1]}"}
+            except:
+                self.logger.exception("")
+                self.logger.error("Please choose a sound file within the 'sounds' directory")
 
     def add_sound_button(self, text: str, sound: Sound, pos: tuple):
         button = SoundButton(text, sound, self.devices, self.logger, self.settings["in_volume"], self.settings["out_volume"])
@@ -79,9 +82,7 @@ class Window:
         button.tk.grid(column=pos[0], row=pos[1])
 
     def add_button(self, text: str, pos: tuple, command: str):
-        command = command.split(":")[0]
-        settings = command.split(":")[:1]
-        func = partial(self.commands[command], settings)
+        func = partial(self.commands[command])
         button = tk.Button(text=text, background="#141f52", activebackground="#0f163b",
                               activeforeground="white", fg="white", width=int(len(text) * 0.8) + 2, height=2,
                               borderwidth=0, border=0, font=self.small_fonts,
@@ -184,7 +185,7 @@ class Window:
         self.elements.clear()
 
     def close(self):
-        if messagebox.askyesno("Quit", "Do you want to quit?"):
+        if not self.settings["warn_before_close"] or messagebox.askyesno("Quit", "Do you want to quit?"):
             for element in self.elements:
                 if isinstance(element, SoundButton):
                     if len(element.players) != 0:

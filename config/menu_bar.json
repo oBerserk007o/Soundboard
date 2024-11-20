@@ -22,6 +22,11 @@
       "command": "navigate:soundboard"
     },
     "2": {
+      "title": "Configuration",
+      "type": "command",
+      "command": "navigate:config"
+    },
+    "3": {
       "title": "Settings",
       "type": "command",
       "command": "navigate:settings"

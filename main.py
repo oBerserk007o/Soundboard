@@ -16,7 +16,7 @@ def load_config_files():
     try:
         with open("config/menus.json", "r") as f:
             menus = json.load(f)
-    except:
+    except FileNotFoundError:
         message = "menus.json file not found (make sure it's named correctly as 'menus.json' and in the config directory)"
         logging.exception(message)
         messagebox.showerror("Something happened", message)
@@ -25,7 +25,7 @@ def load_config_files():
     try:
         with open("config/menu_bar.json", "r") as f:
             menu_bar = json.load(f)
-    except:
+    except FileNotFoundError:
         message = "menu_bar.json file not found (make sure it's named correctly as 'menu_bar.json' and in the config directory)"
         logging.exception(message)
         messagebox.showerror("Something happened", message)
@@ -34,7 +34,7 @@ def load_config_files():
     try:
         with open("config/settings.json", "r") as f:
             settings = json.load(f)
-    except:
+    except FileNotFoundError:
         message = "settings.json file not found (make sure it's named correctly as 'settings.json' and in the config directory)"
         logging.exception(message)
         messagebox.showerror("Something happened", message)
@@ -78,8 +78,8 @@ def main():
 
     asyncio.run(run_asyncio(window))
 
-main_thread = threading.Thread(target=main)
 
 if __name__ == "__main__":
+    main_thread = threading.Thread(target=main)
     main_thread.start()
     main_thread.join()
