@@ -19,6 +19,30 @@
         "type": "label",
         "name": "[insert settings here]",
         "pos": "0,0"
+      },
+      "1": {
+        "type": "switch",
+        "setting": "warn_before_close",
+        "name": "warn_before_close",
+        "pos": "0,1"
+      },
+      "2": {
+        "type": "slider",
+        "setting": "out_volume",
+        "name": "out_volume",
+        "pos": "0,2"
+      },
+      "3": {
+        "type": "slider",
+        "setting": "in_volume",
+        "name": "in_volume",
+        "pos": "0,3"
+      },
+      "4": {
+        "type": "slider",
+        "setting": "tps",
+        "name": "tps",
+        "pos": "0,4"
       }
     }
   },

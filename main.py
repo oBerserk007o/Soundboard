@@ -1,11 +1,11 @@
 import asyncio
 import json
 import threading
-from window import Window
 import logging
 import time
-import sounddevice as sd
 from tkinter import messagebox
+import sounddevice as sd
+from window import Window
 
 
 def load_config_files():

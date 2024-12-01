@@ -5,10 +5,12 @@ import pathlib
 import tkinter as tk
 from tkinter import font as tk_font, messagebox, Menu, simpledialog
 from tkinter.filedialog import askopenfilename
-from buttons import SoundButton
-from player import Sound
 import logging
 from functools import partial
+
+from buttons import SoundButton
+from layout_manager import LayoutManager
+from player import Sound
 
 
 def choose_settings_for_button():
@@ -16,6 +18,8 @@ def choose_settings_for_button():
     if name != None:
         file = askopenfilename().split("/")[-1]
     else:
+        return
+    if file is None:
         return
     return [name, file]
 
@@ -47,6 +51,8 @@ class Window:
 
         self.settings = settings
 
+        self.layout_manager = LayoutManager(self.root, [], self.commands, menus, 12, logger)
+
         logger.info("Window created")
 
     def add_label(self, text: str, pos: tuple):
@@ -72,7 +78,7 @@ class Window:
     def add_sound_button(self, text: str, sound: Sound, pos: tuple):
         button = SoundButton(text, sound, self.devices, self.logger, self.settings["in_volume"], self.settings["out_volume"])
         tk_button = tk.Button(text=text, background="#141f52", activebackground="#0f163b",
-                              activeforeground="white", fg="white", width=int(len(text) * 0.8) + 2, height=2,
+                              activeforeground="white", fg="white", width=12, height=2,
                               borderwidth=0, border=0, font=self.small_fonts,
                               command=lambda: asyncio.run_coroutine_threadsafe(button.play_sound(),
                                                                                asyncio.get_running_loop()))
@@ -84,7 +90,7 @@ class Window:
     def add_button(self, text: str, pos: tuple, command: str):
         func = partial(self.commands[command])
         button = tk.Button(text=text, background="#141f52", activebackground="#0f163b",
-                              activeforeground="white", fg="white", width=int(len(text) * 0.8) + 2, height=2,
+                              activeforeground="white", fg="white", width=12, height=2,
                               borderwidth=0, border=0, font=self.small_fonts,
                               command=func)
         self.elements.append(button)
