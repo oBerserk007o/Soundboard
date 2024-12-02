@@ -12,7 +12,7 @@ def load_config_files():
     menus = {}
     menu_bar = {}
     settings = {}
-    
+
     try:
         with open("config/menus.json", "r") as f:
             menus = json.load(f)
@@ -21,7 +21,7 @@ def load_config_files():
         logging.exception(message)
         messagebox.showerror("Something happened", message)
         exit(0)
-    
+
     try:
         with open("config/menu_bar.json", "r") as f:
             menu_bar = json.load(f)
@@ -30,7 +30,7 @@ def load_config_files():
         logging.exception(message)
         messagebox.showerror("Something happened", message)
         exit(0)
-    
+
     try:
         with open("config/settings.json", "r") as f:
             settings = json.load(f)
@@ -51,7 +51,7 @@ for element in queried_devices:
         break
 
 logging.basicConfig(
-    filename=f"{time.strftime("%Y%m%d_%H%M%S")}.log",
+    filename=f"{time.strftime('%Y%m%d_%H%M%S')}.log",
     encoding="utf-8",
     filemode="a",
     format="[{asctime}] {levelname}: {message}",

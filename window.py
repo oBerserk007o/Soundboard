@@ -51,16 +51,14 @@ class Window:
 
         self.settings = settings
 
-        self.layout_manager = LayoutManager(self.root, [], self.commands, menus, 12, logger)
+        button_config = {
+            "min_pad_x": 15,
+            "button_x_size": "",
+            "pad_y": 30
+        }
+        self.layout_manager = LayoutManager(self.root, [], self.commands, menus, button_config, logger)
 
         logger.info("Window created")
-
-    def add_label(self, text: str, pos: tuple):
-        label = (tk.Label(text=text, background="#141f52", activebackground="#0f163b",
-                              activeforeground="white", fg="white", width=int(len(text) * 0.8) + 2, height=2,
-                              borderwidth=0, border=0, font=self.small_fonts))
-        label.grid(column=pos[0], row=pos[1])
-        self.elements.append(label)
 
     def add_sound_button_from_button(self):
         settings = choose_settings_for_button()
@@ -87,43 +85,66 @@ class Window:
 
         button.tk.grid(column=pos[0], row=pos[1])
 
-    def add_button(self, text: str, pos: tuple, command: str):
-        func = partial(self.commands[command])
-        button = tk.Button(text=text, background="#141f52", activebackground="#0f163b",
-                              activeforeground="white", fg="white", width=12, height=2,
-                              borderwidth=0, border=0, font=self.small_fonts,
-                              command=func)
-        self.elements.append(button)
 
-        button.grid(column=pos[0], row=pos[1])
+    # def load_menu(self, selected_menu: str):
+    #     menu = self.menus[selected_menu]
+    #     self.clear()
+    #
+    #     for i in range(len(menu["elements"])):
+    #         i = str(i)
+    #         element = menu["elements"][i]
+    #         match element["type"]:
+    #             case "label":
+    #                 self.add_label(element["name"], tuple(element["pos"].split(",")))
+    #             case "add_button":
+    #                 self.add_button(element["name"], tuple(element["pos"].split(",")), element["command"])
+    #
+    #     if "sounds" in menu:
+    #         try:
+    #             with open(menu["sounds"]) as f:
+    #                 sounds = json.load(f)
+    #                 self.sounds = sounds
+    #             for i in range(len(sounds["elements"])):
+    #                 i = str(i)
+    #                 self.add_sound_button(sounds["elements"][i]["name"], Sound(sounds["elements"][i]["sound"]),
+    #                                 tuple(sounds["elements"][i]["pos"].split(",")))
+    #         except:
+    #             self.logger.exception("Invalid menu file")
+    #     else:
+    #         pass
+    #     self.logger.info(f"Loaded menu {menu['name']}")
 
     def load_menu(self, selected_menu: str):
         menu = self.menus[selected_menu]
         self.clear()
+
+        self.root.bind("<Configure>", lambda e: None)
 
         for i in range(len(menu["elements"])):
             i = str(i)
             element = menu["elements"][i]
             match element["type"]:
                 case "label":
-                    self.add_label(element["name"], tuple(element["pos"].split(",")))
+                    self.layout_manager.add_label(element["name"])
                 case "add_button":
-                    self.add_button(element["name"], tuple(element["pos"].split(",")), element["command"])
+                    self.layout_manager.add_button(element["name"], element["command"])
 
-        if "sounds" in menu:
-            try:
-                with open(menu["sounds"]) as f:
-                    sounds = json.load(f)
-                    self.sounds = sounds
-                for i in range(len(sounds["elements"])):
-                    i = str(i)
-                    self.add_sound_button(sounds["elements"][i]["name"], Sound(sounds["elements"][i]["sound"]),
-                                    tuple(sounds["elements"][i]["pos"].split(",")))
-            except:
-                self.logger.exception("Invalid menu file")
-        else:
-            pass
-        self.logger.info(f"Loaded menu {menu['name']}")
+        match menu["name"]:
+            case "soundboard":
+                self.layout_manager.update_soundboard_layout()
+                self.root.bind("<Configure>", lambda e: self.layout_manager.update_soundboard_layout())
+                try:
+                    with open(menu["sounds"]) as f:
+                        sounds = json.load(f)
+                        self.sounds = sounds
+                    for i in range(len(sounds["elements"])):
+                        i = str(i)
+                        self.add_sound_button(sounds["elements"][i]["name"], Sound(sounds["elements"][i]["sound"]),
+                                              tuple(sounds["elements"][i]["pos"].split(",")))
+                except:
+                    self.logger.exception("Invalid menu file")
+            case "settings":
+                pass
 
     def load_menu_bar(self, menu_bar: dict):
         menu_bar_tk = Menu()
